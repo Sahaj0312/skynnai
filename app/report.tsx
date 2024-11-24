@@ -79,7 +79,7 @@ export default function Report() {
           <Text style={[styles.statusText, { color: getStatusColor(status) }]}>
             {status}
           </Text>
-          <Text style={styles.percentageText}>{value}%</Text>
+          <Text style={styles.percentageText}>XX%</Text>
         </View>
       </View>
     </View>
@@ -94,22 +94,7 @@ export default function Report() {
   );
 
   const calculateOverallHealth = () => {
-    const metrics = [
-      { value: 75, weight: 1 }, // Hydration
-      { value: 60, weight: 1 }, // Elasticity
-      { value: 40, weight: 1 }, // Pigmentation
-      { value: 85, weight: 1 }, // Texture
-      { value: 55, weight: 1 }, // Pore Size
-      { value: 30, weight: 1 }, // Oil Production
-    ];
-
-    const totalWeight = metrics.reduce((sum, metric) => sum + metric.weight, 0);
-    const weightedSum = metrics.reduce(
-      (sum, metric) => sum + metric.value * metric.weight,
-      0
-    );
-
-    return Math.round(weightedSum / totalWeight);
+    return 58;
   };
 
   const getOverallStatusColor = (value: number) => {
@@ -118,8 +103,8 @@ export default function Report() {
     return "#FF5252"; // Poor - Red
   };
 
-  const calculateDifference = (current: number, potential: number) => {
-    return potential - current;
+  const calculateDifference = () => {
+    return "XX";
   };
 
   return (
@@ -128,6 +113,7 @@ export default function Report() {
         <Text style={styles.pageTitle}>
           {name ? `${name}'s Skin Report` : "Skin Report"}
         </Text>
+
         <Text style={styles.date}>{currentDate}</Text>
       </View>
 
@@ -150,32 +136,44 @@ export default function Report() {
         <View style={styles.overallHealthSection}>
           <Text style={styles.overallTitle}>Overall Skin Health</Text>
           <CircularProgress
-            value={calculateOverallHealth()}
+            value={58}
             radius={80}
             duration={0}
-            progressValueColor={"#000"}
+            progressValueColor={"transparent"}
             maxValue={100}
-            activeStrokeColor={getOverallStatusColor(calculateOverallHealth())}
+            activeStrokeColor={getOverallStatusColor(58)}
             inActiveStrokeColor={"#E0E0E0"}
             inActiveStrokeOpacity={0.5}
             inActiveStrokeWidth={8}
             activeStrokeWidth={16}
-            valueSuffix={"%"}
-            title={""}
-            progressValueStyle={{ fontSize: 36, fontWeight: "bold" }}
-            initialValue={calculateOverallHealth()}
+            title={"XX%"}
+            titleStyle={{
+              fontSize: SCREEN_HEIGHT * 0.045,
+              fontWeight: "bold",
+              color: "#000",
+              textAlign: "center",
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+              lineHeight: 160,
+              padding: 0,
+              margin: 0,
+            }}
+            titleColor={"#000"}
+            progressValueStyle={{ fontSize: 0 }}
+            initialValue={58}
           />
         </View>
       </View>
 
       <Animated.View entering={FadeIn.duration(1000)} style={styles.card}>
         <View style={styles.metricsContainer}>
-          {renderMetric("Hydration", 75, "Good")}
-          {renderMetric("Elasticity", 60, "Fair")}
-          {renderMetric("Pigmentation", 40, "Poor")}
-          {renderMetric("Texture", 85, "Good")}
-          {renderMetric("Pore Size", 55, "Fair")}
-          {renderMetric("Oil Production", 30, "Poor")}
+          {renderMetric("Hydration", 62, "Fair")}
+          {renderMetric("XXXXXXXX", 55, "Fair")}
+          {renderMetric("XXXXXXXXX", 40, "Poor")}
+          {renderMetric("XXXXXXX", 85, "Good")}
+          {renderMetric("XXXXXXXXX", 55, "Fair")}
+          {renderMetric("XXXXXXX", 30, "Poor")}
         </View>
       </Animated.View>
 
@@ -185,9 +183,9 @@ export default function Report() {
             Critical Issues
           </Text>
           <View style={styles.issuesList}>
-            <Text style={styles.issueItem}>• Low Oil Production</Text>
-            <Text style={styles.issueItem}>• Poor Pigmentation</Text>
-            <Text style={styles.issueItem}>• Fair Elasticity</Text>
+            <Text style={styles.issueItem}>• XXX XXX XXXXXXX</Text>
+            <Text style={styles.issueItem}>• XXXX XXXXXXX</Text>
+            <Text style={styles.issueItem}>• XXXX XXXXXX</Text>
           </View>
         </View>
 
@@ -197,9 +195,7 @@ export default function Report() {
             <Text style={styles.potentialScore}>92%</Text>
             <View style={styles.improvementContainer}>
               <MaterialIcons name="arrow-upward" size={16} color="#4CAF50" />
-              <Text style={styles.improvementText}>
-                +{calculateDifference(calculateOverallHealth(), 92)}%
-              </Text>
+              <Text style={styles.improvementText}>+XX%</Text>
             </View>
           </View>
         </View>
@@ -230,7 +226,7 @@ const styles = StyleSheet.create({
   pageTitle: {
     fontSize: SCREEN_HEIGHT * 0.032,
     fontWeight: "bold",
-    color: "#000",
+    color: "#005b4f",
     marginBottom: 5,
     textAlign: "center",
   },
@@ -266,6 +262,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 3.84,
     elevation: 5,
+    borderColor: "#005b4f",
+    borderWidth: 3,
   },
   placeholderImage: {
     width: "100%",

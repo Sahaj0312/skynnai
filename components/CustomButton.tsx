@@ -130,6 +130,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: Dimensions.get("window").height * 0.025,
     position: "absolute",
-    fontWeight: "500",
+    fontWeight: "600",
   },
 });

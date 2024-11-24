@@ -24,7 +24,7 @@ export interface OnboardingData {
 const data: OnboardingData[] = [
   {
     id: 1,
-    question: "What should I call you?",
+    question: "What's your first name?",
     type: "text",
     textColor: "#005b4f",
     backgroundColor: "#FCFBF4",

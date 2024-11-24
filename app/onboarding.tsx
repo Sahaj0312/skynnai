@@ -10,6 +10,7 @@ import Pagination from "../components/Pagination";
 import CustomButton from "../components/CustomButton";
 import RenderItem from "../components/RenderItem";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const OnboardingScreen = () => {
   const router = useRouter();
@@ -22,9 +23,16 @@ const OnboardingScreen = () => {
     }));
   }, []);
 
-  const handleComplete = useCallback(() => {
-    console.log("Form answers:", answers);
-    router.push("/");
+  const handleComplete = useCallback(async () => {
+    try {
+      // Store all answers in AsyncStorage
+      await AsyncStorage.setItem("userData", JSON.stringify(answers));
+      console.log("Form answers:", answers);
+      router.push("/camera");
+    } catch (error) {
+      console.error("Error saving user data:", error);
+      router.push("/camera");
+    }
   }, [answers]);
 
   const flatListRef = useAnimatedRef<FlatList<OnboardingData>>();

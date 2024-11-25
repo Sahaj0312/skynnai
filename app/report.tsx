@@ -34,45 +34,103 @@ export default function Report() {
   const [maxPotential, setMaxPotential] = React.useState(0);
   const [overallHealth, setOverallHealth] = React.useState(0);
 
+  const saveMetricsToStorage = async (
+    metricsData: { [key: string]: MetricData },
+    overallHealthValue: number,
+    maxPotentialValue: number
+  ) => {
+    try {
+      await AsyncStorage.setItem(
+        "reportMetrics",
+        JSON.stringify({
+          metrics: metricsData,
+          overallHealth: overallHealthValue,
+          maxPotential: maxPotentialValue,
+          generatedAt: new Date().toISOString(),
+        })
+      );
+    } catch (error) {
+      console.error("Error saving metrics:", error);
+    }
+  };
+
+  const loadMetricsFromStorage = async () => {
+    try {
+      const savedMetrics = await AsyncStorage.getItem("reportMetrics");
+      if (savedMetrics) {
+        const {
+          metrics: savedMetricsData,
+          overallHealth: savedHealth,
+          maxPotential: savedPotential,
+        } = JSON.parse(savedMetrics);
+        setMetrics(savedMetricsData);
+        setOverallHealth(savedHealth);
+        setMaxPotential(savedPotential);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error loading metrics:", error);
+      return false;
+    }
+  };
+
   React.useEffect(() => {
-    loadUserData();
-    const newMetrics: { [key: string]: MetricData } = {
-      Hydration: {
-        value: getRandomPercentage(50, 55),
-        status: "Fair" as const,
-      },
-      XXXXXXXX: {
-        value: getRandomPercentage(70, 80),
-        status: "Fair" as const,
-      },
-      XXXXXXX: {
-        value: getRandomPercentage(20, 75),
-        status: "Poor" as const,
-      },
-      XXXXXXXXX: {
-        value: getRandomPercentage(50, 70),
-        status: "Good" as const,
-      },
-      XXXXX: {
-        value: getRandomPercentage(20, 40),
-        status: "Fair" as const,
-      },
-      XXXXXXXXXX: {
-        value: getRandomPercentage(20, 90),
-        status: "Poor" as const,
-      },
+    const initializeData = async () => {
+      await loadUserData();
+      const metricsExist = await loadMetricsFromStorage();
+
+      if (!metricsExist) {
+        const newMetrics: { [key: string]: MetricData } = {
+          Hydration: {
+            value: getRandomPercentage(20, 90),
+            status: "Fair" as const,
+          },
+          XXXXXXXXX: {
+            value: getRandomPercentage(20, 90),
+            status: "Fair" as const,
+          },
+          XXXXX: {
+            value: getRandomPercentage(20, 90),
+            status: "Poor" as const,
+          },
+          XXXXXXX: {
+            value: getRandomPercentage(20, 90),
+            status: "Good" as const,
+          },
+          XXXXXXXXXX: {
+            value: getRandomPercentage(20, 90),
+            status: "Fair" as const,
+          },
+          XXXXXX: {
+            value: getRandomPercentage(20, 90),
+            status: "Poor" as const,
+          },
+        };
+
+        Object.keys(newMetrics).forEach((key) => {
+          const value = newMetrics[key].value;
+          newMetrics[key].status =
+            value >= 70 ? "Good" : value >= 50 ? "Fair" : "Poor";
+        });
+
+        const newOverallHealth = getRandomPercentage(40, 65);
+        const newMaxPotential = getRandomPercentage(89, 97);
+
+        setMetrics(newMetrics);
+        setMaxPotential(newMaxPotential);
+        setOverallHealth(newOverallHealth);
+
+        await saveMetricsToStorage(
+          newMetrics,
+          newOverallHealth,
+          newMaxPotential
+        );
+      }
+      setIsReady(true);
     };
 
-    Object.keys(newMetrics).forEach((key) => {
-      const value = newMetrics[key].value;
-      newMetrics[key].status =
-        value >= 70 ? "Good" : value >= 50 ? "Fair" : "Poor";
-    });
-
-    setMetrics(newMetrics);
-    setMaxPotential(getRandomPercentage(89, 97));
-    setOverallHealth(getRandomPercentage(40, 60));
-    setIsReady(true);
+    initializeData();
   }, []);
 
   const loadUserData = async () => {
@@ -101,34 +159,37 @@ export default function Report() {
     }
   };
 
-  const renderMetric = (
-    title: string,
-    value: number,
-    status: MetricData["status"]
-  ) => (
-    <View style={styles.metricRow}>
-      <Text style={styles.metricTitle}>{title}</Text>
-      <View style={styles.metricContent}>
-        <View style={styles.progressContainer}>
-          <View
-            style={[
-              styles.progressBar,
-              {
-                width: `${value}%`,
-                backgroundColor: getStatusColor(status),
-              },
-            ]}
-          />
-        </View>
-        <View style={styles.metricInfo}>
-          <Text style={[styles.statusText, { color: getStatusColor(status) }]}>
-            {status}
-          </Text>
-          <Text style={styles.percentageText}>XX%</Text>
+  const renderMetrics = () => {
+    return Object.entries(metrics).map(([key, data]) => (
+      <View key={key} style={styles.metricRow}>
+        <Text style={styles.metricTitle}>{key}</Text>
+        <View style={styles.metricContent}>
+          <View style={styles.progressContainer}>
+            <View
+              style={[
+                styles.progressBar,
+                {
+                  width: `${data.value}%`,
+                  backgroundColor: getStatusColor(data.status),
+                },
+              ]}
+            />
+          </View>
+          <View style={styles.metricInfo}>
+            <Text
+              style={[
+                styles.statusText,
+                { color: getStatusColor(data.status) },
+              ]}
+            >
+              {data.status}
+            </Text>
+            <Text style={styles.percentageText}>XX%</Text>
+          </View>
         </View>
       </View>
-    </View>
-  );
+    ));
+  };
 
   const [currentDate] = React.useState(
     new Date().toLocaleDateString("en-US", {
@@ -212,11 +273,7 @@ export default function Report() {
       </View>
 
       <Animated.View entering={FadeIn.duration(1000)} style={styles.card}>
-        <View style={styles.metricsContainer}>
-          {Object.entries(metrics).map(([key, data]) =>
-            renderMetric(key, data.value, data.status)
-          )}
-        </View>
+        <View style={styles.metricsContainer}>{renderMetrics()}</View>
       </Animated.View>
 
       <View style={styles.bottomCardsContainer}>

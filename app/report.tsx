@@ -12,6 +12,7 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CircularProgress from "react-native-circular-progress-indicator";
 import { MaterialIcons } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -213,6 +214,10 @@ export default function Report() {
     return "XX";
   };
 
+  const handleUnlockReport = () => {
+    router.push("/(dashboard)/reports");
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.headerSection}>
@@ -300,12 +305,7 @@ export default function Report() {
         </View>
       </View>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          console.log("Unlock Report pressed");
-        }}
-      >
+      <TouchableOpacity style={styles.button} onPress={handleUnlockReport}>
         <Text style={styles.buttonText}>Unlock Report</Text>
       </TouchableOpacity>
     </SafeAreaView>

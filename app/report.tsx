@@ -20,13 +20,58 @@ type MetricData = {
   status: "Good" | "Fair" | "Poor";
 };
 
+const getRandomPercentage = (min: number, max: number) => {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
 export default function Report() {
   const [name, setName] = React.useState<string>("");
   const [photoUri, setPhotoUri] = React.useState<string>("");
   const [isReady, setIsReady] = React.useState(false);
+  const [metrics, setMetrics] = React.useState<{ [key: string]: MetricData }>(
+    {}
+  );
+  const [maxPotential, setMaxPotential] = React.useState(0);
+  const [overallHealth, setOverallHealth] = React.useState(0);
 
   React.useEffect(() => {
     loadUserData();
+    const newMetrics: { [key: string]: MetricData } = {
+      Hydration: {
+        value: getRandomPercentage(50, 55),
+        status: "Fair" as const,
+      },
+      XXXXXXXX: {
+        value: getRandomPercentage(70, 80),
+        status: "Fair" as const,
+      },
+      XXXXXXX: {
+        value: getRandomPercentage(20, 75),
+        status: "Poor" as const,
+      },
+      XXXXXXXXX: {
+        value: getRandomPercentage(50, 70),
+        status: "Good" as const,
+      },
+      XXXXX: {
+        value: getRandomPercentage(20, 40),
+        status: "Fair" as const,
+      },
+      XXXXXXXXXX: {
+        value: getRandomPercentage(20, 90),
+        status: "Poor" as const,
+      },
+    };
+
+    Object.keys(newMetrics).forEach((key) => {
+      const value = newMetrics[key].value;
+      newMetrics[key].status =
+        value >= 70 ? "Good" : value >= 50 ? "Fair" : "Poor";
+    });
+
+    setMetrics(newMetrics);
+    setMaxPotential(getRandomPercentage(89, 97));
+    setOverallHealth(getRandomPercentage(40, 60));
     setIsReady(true);
   }, []);
 
@@ -136,12 +181,12 @@ export default function Report() {
         <View style={styles.overallHealthSection}>
           <Text style={styles.overallTitle}>Overall Skin Health</Text>
           <CircularProgress
-            value={58}
+            value={overallHealth}
             radius={80}
             duration={0}
             progressValueColor={"transparent"}
             maxValue={100}
-            activeStrokeColor={getOverallStatusColor(58)}
+            activeStrokeColor={getOverallStatusColor(overallHealth)}
             inActiveStrokeColor={"#E0E0E0"}
             inActiveStrokeOpacity={0.5}
             inActiveStrokeWidth={8}
@@ -161,25 +206,22 @@ export default function Report() {
             }}
             titleColor={"#000"}
             progressValueStyle={{ fontSize: 0 }}
-            initialValue={58}
+            initialValue={overallHealth}
           />
         </View>
       </View>
 
       <Animated.View entering={FadeIn.duration(1000)} style={styles.card}>
         <View style={styles.metricsContainer}>
-          {renderMetric("Hydration", 62, "Fair")}
-          {renderMetric("XXXXXXXX", 55, "Fair")}
-          {renderMetric("XXXXXXXXX", 40, "Poor")}
-          {renderMetric("XXXXXXX", 85, "Good")}
-          {renderMetric("XXXXXXXXX", 55, "Fair")}
-          {renderMetric("XXXXXXX", 30, "Poor")}
+          {Object.entries(metrics).map(([key, data]) =>
+            renderMetric(key, data.value, data.status)
+          )}
         </View>
       </Animated.View>
 
       <View style={styles.bottomCardsContainer}>
         <View style={styles.bottomCard}>
-          <Text style={[styles.bottomCardTitle, { color: "#FF5252" }]}>
+          <Text style={[styles.bottomCardTitle, { color: "red" }]}>
             Critical Issues
           </Text>
           <View style={styles.issuesList}>
@@ -192,7 +234,7 @@ export default function Report() {
         <View style={[styles.bottomCard, styles.rightBottomCard]}>
           <Text style={styles.bottomCardTitle}>Max Potential</Text>
           <View style={styles.potentialContainer}>
-            <Text style={styles.potentialScore}>92%</Text>
+            <Text style={styles.potentialScore}>{maxPotential}%</Text>
             <View style={styles.improvementContainer}>
               <MaterialIcons name="arrow-upward" size={16} color="#4CAF50" />
               <Text style={styles.improvementText}>+XX%</Text>

@@ -1,25 +1,4 @@
-import { AnimationObject } from "lottie-react-native";
-
-export type SkinType = "oily" | "dry" | "combination" | "normal" | "sensitive";
-export type SkinGoal =
-  | "anti-aging"
-  | "acne"
-  | "brightening"
-  | "hydration"
-  | "even-tone"
-  | "pore-minimizing";
-
-export interface OnboardingData {
-  id: number;
-  question: string;
-  type: "text" | "number" | "select" | "multiselect";
-  options?: string[];
-  textColor: string;
-  backgroundColor: string;
-  key: "name" | "age" | "skinType" | "sensitivities" | "goals";
-  placeholder?: string;
-  validation?: (value: any) => boolean;
-}
+import { OnboardingData, SkinType, SkinGoal } from "../types";
 
 const data: OnboardingData[] = [
   {

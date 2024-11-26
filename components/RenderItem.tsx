@@ -17,7 +17,7 @@ import Animated, {
   interpolate,
   Extrapolation,
 } from "react-native-reanimated";
-import { OnboardingData } from "../data/data";
+import { OnboardingData } from "@/types";
 
 type Props = {
   index: number;

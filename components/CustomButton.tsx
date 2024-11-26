@@ -8,13 +8,12 @@ import React from "react";
 import Animated, {
   AnimatedRef,
   SharedValue,
-  interpolateColor,
   useAnimatedStyle,
   withSpring,
   withTiming,
 } from "react-native-reanimated";
 import { useNavigation } from "@react-navigation/native";
-import { OnboardingData } from "../data/data";
+import { OnboardingData } from "@/types";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigator/RootNavigator";
 import { Dimensions } from "react-native";

@@ -5,7 +5,7 @@ import Animated, {
   interpolateColor,
   useAnimatedStyle,
   interpolate,
-  Extrapolate,
+  Extrapolation,
   withSpring,
 } from "react-native-reanimated";
 
@@ -24,7 +24,7 @@ const Pagination = ({ data, x }: Props) => {
             x.value,
             [(i - 1) * SCREEN_WIDTH, i * SCREEN_WIDTH, (i + 1) * SCREEN_WIDTH],
             [10, 20, 10],
-            Extrapolate.CLAMP
+            Extrapolation.CLAMP
           );
 
           return {

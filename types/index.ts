@@ -28,3 +28,14 @@ export interface OnboardingData {
   placeholder?: string;
   validation?: (value: any) => boolean;
 }
+
+export type SkinCareReport = {
+  faceDetected: boolean;
+  overallSkinHealthScore: number;
+  hydration: number;
+  oilBalance: number;
+  skinTone: number;
+  poreClarity: number;
+  acne: number;
+  elasticity: number;
+};

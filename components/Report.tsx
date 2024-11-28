@@ -28,7 +28,7 @@ interface ReportProps {
   };
   hydration?: MetricData;
   oilBalance?: MetricData;
-  skinTone?: MetricData;
+  smoothness?: MetricData;
   poreClarity?: MetricData;
   acne?: MetricData;
   elasticity?: MetricData;
@@ -43,7 +43,7 @@ export default function Report(props: ReportProps) {
     skinScore,
     hydration,
     oilBalance,
-    skinTone,
+    smoothness,
     poreClarity,
     acne,
     elasticity,
@@ -71,7 +71,7 @@ export default function Report(props: ReportProps) {
   const metricsData = {
     Hydration: hydration,
     "Oil Balance": oilBalance,
-    "Skin Tone": skinTone,
+    Smoothness: smoothness,
     "Pore Clarity": poreClarity,
     Acne: acne,
     Elasticity: elasticity,

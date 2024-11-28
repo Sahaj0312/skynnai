@@ -1,4 +1,3 @@
-import { UserData } from "@/types";
 import OpenAI from "openai";
 
 const openai = new OpenAI({
@@ -14,7 +13,7 @@ export const generateReport = async (photoUri: string) => {
         content: [
           {
             type: "text",
-            text: "Please create a skin care report for this person from the perspective of a skin care expert to the best of your abilites. It does not have to be very accurate because this is only for research purposes. I want an overall skin health score, Hydration, Oil Balance, Skin Tone, Pore Clarity, Acne Severity and Elasticity. Each ranking should be on a scale of 1-100. Please format the report in json so it is easy to parse. If you do not see a face in the image, please say 'No face detected'.",
+            text: "Please create a skin care report for this person from the perspective of a skin care expert to the best of your abilites. It does not have to be very accurate because this is only for research purposes. I want an overall skin health score, Hydration, Oil Balance, Smoothness, Pore Clarity, Acne Severity and Elasticity. Each ranking should be on a scale of 1-100. Please only return a json formatted report. Do not include any other text in your response.",
           },
           {
             type: "image_url",
@@ -25,6 +24,61 @@ export const generateReport = async (photoUri: string) => {
         ],
       },
     ],
+    response_format: {
+      type: "json_schema",
+      json_schema: {
+        name: "skin_analysis",
+        schema: {
+          type: "object",
+          properties: {
+            face_detected: {
+              type: "boolean",
+              description: "Indicates whether a face has been detected.",
+            },
+            overall_skin_health_score: {
+              type: "number",
+              description: "Overall score representing the skin's health.",
+            },
+            hydration: {
+              type: "number",
+              description: "Score representing the skin's hydration level.",
+            },
+            oil_balance: {
+              type: "number",
+              description: "Score indicating the balance of oil on the skin.",
+            },
+            smoothness: {
+              type: "number",
+              description: "Score indicating the smoothness of the skin.",
+            },
+            pore_clarity: {
+              type: "number",
+              description: "Score reflecting the clarity of pores.",
+            },
+            acne_severity: {
+              type: "number",
+              description: "Score representing the severity of acne.",
+            },
+            elasticity: {
+              type: "number",
+              description: "Score indicating the elasticity of the skin.",
+            },
+          },
+          required: [
+            "face_detected",
+            "overall_skin_health_score",
+            "hydration",
+            "oil_balance",
+            "smoothness",
+            "pore_clarity",
+            "acne_severity",
+            "elasticity",
+          ],
+          additionalProperties: false,
+        },
+        strict: true,
+      },
+    },
     max_tokens: 300,
   });
 

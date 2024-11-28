@@ -5,12 +5,13 @@ import Animated, {
   useAnimatedScrollHandler,
   useAnimatedRef,
 } from "react-native-reanimated";
-import data, { OnboardingData } from "../data/data";
+import data from "../data/data";
 import Pagination from "../components/Pagination";
 import CustomButton from "../components/CustomButton";
 import RenderItem from "../components/RenderItem";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { OnboardingData } from "@/types";
 
 const OnboardingScreen = () => {
   const router = useRouter();

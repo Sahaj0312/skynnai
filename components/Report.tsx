@@ -141,6 +141,7 @@ export default function Report(props: ReportProps) {
             inActiveStrokeOpacity={0.5}
             inActiveStrokeWidth={8}
             activeStrokeWidth={16}
+            initialValue={skinScore.value}
             progressValueStyle={{ fontSize: 0 }}
           />
         </View>

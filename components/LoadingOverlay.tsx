@@ -12,22 +12,21 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import LottieView from "lottie-react-native";
-import { router } from "expo-router";
 
-const LoadingPage = () => {
+interface LoadingOverlayProps {
+  message?: string;
+  submessage?: string;
+}
+
+export function LoadingOverlay({
+  message = "Loading...",
+  submessage = "Please wait while I work my magic!",
+}: LoadingOverlayProps) {
   const { width: SCREEN_WIDTH } = useWindowDimensions();
   const opacity = useSharedValue(0);
 
   React.useEffect(() => {
-    // Fade in animation
     opacity.value = withTiming(1, { duration: 1000 });
-
-    // Redirect to report after 15 seconds
-    const timeout = setTimeout(() => {
-      router.push("/report");
-    }, 15000);
-
-    return () => clearTimeout(timeout);
   }, []);
 
   const animationStyle = useAnimatedStyle(() => ({
@@ -61,22 +60,19 @@ const LoadingPage = () => {
         />
       </Animated.View>
       <View style={styles.textContainer}>
-        <Text style={styles.text}>Loading...</Text>
-        <Text style={styles.textSub}>
-          Please wait on this page while I work my magic!
-        </Text>
+        <Text style={styles.text}>{message}</Text>
+        <Text style={styles.textSub}>{submessage}</Text>
       </View>
     </View>
   );
-};
-
-export default LoadingPage;
+}
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 1000,
   },
   circleContainer: {
     ...StyleSheet.absoluteFillObject,

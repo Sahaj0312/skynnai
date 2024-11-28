@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  SafeAreaView,
-  StyleSheet,
-  Dimensions,
-  ActivityIndicator,
-  Text,
-} from "react-native";
+import { SafeAreaView, StyleSheet, Text } from "react-native";
+import { LoadingOverlay } from "../components/LoadingOverlay";
 import ReportCard from "../components/Report";
 import { generateReport } from "@/services/ai";
 import { storage } from "@/services/storage";
@@ -75,7 +70,7 @@ export default function ReportScreen() {
   return (
     <SafeAreaView style={styles.container}>
       {loading ? (
-        <ActivityIndicator size="large" color="#005b4f" />
+        <LoadingOverlay />
       ) : error ? (
         <Text style={styles.errorText}>{error}</Text>
       ) : !report ? (

@@ -50,7 +50,7 @@ export default function Confirmation() {
           })
         );
       }
-      router.push("/report");
+      router.push("/blur");
     } catch (error) {
       console.error("Error saving photo:", error);
       router.push("/report");

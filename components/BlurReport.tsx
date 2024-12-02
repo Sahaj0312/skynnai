@@ -10,8 +10,9 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
-
+import RevenueCatUI, { PAYWALL_RESULT } from "react-native-purchases-ui";
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+import useRevenueCat from "../hooks/useRevenueCat";
 
 interface BlurReportProps {
   name: string;
@@ -21,9 +22,16 @@ interface BlurReportProps {
 
 export default function BlurReport(props: BlurReportProps) {
   const { name, photoUri, date } = props;
-
-  const handleUnlockReport = () => {
-    router.push("/(dashboard)/reports");
+  const { isProMember } = useRevenueCat();
+  console.log(isProMember);
+  const handleUnlockReport = async () => {
+    const paywallResult: PAYWALL_RESULT =
+      await RevenueCatUI.presentPaywallIfNeeded({
+        requiredEntitlementIdentifier: "pro",
+      });
+    console.log(paywallResult);
+    console.log(isProMember);
+    //router.push("/(dashboard)/reports");
   };
 
   return (

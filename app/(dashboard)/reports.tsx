@@ -13,7 +13,7 @@ import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { MaterialIcons } from "@expo/vector-icons";
-import Report from "../report";
+import Report from "@/components/Report";
 import useRevenueCat from "@/hooks/useRevenueCat";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -106,10 +106,41 @@ export default function ReportsPage() {
         {reports.map((report, index) => (
           <View key={report.id} style={styles.slideContainer}>
             <Report
-              isStatic
-              reportData={report.reportData}
               name={report.name}
               photoUri={report.photoUri}
+              skinScore={{
+                value: report.reportData.overall_skin_health_score ?? 0,
+                status: getSkinScoreStatus(
+                  report.reportData.overall_skin_health_score ?? 0
+                ),
+              }}
+              hydration={{
+                value: report.reportData.hydration ?? 0,
+                status: getSkinScoreStatus(report.reportData.hydration ?? 0),
+              }}
+              oilBalance={{
+                value: report.reportData.oil_balance ?? 0,
+                status: getSkinScoreStatus(report.reportData.oil_balance ?? 0),
+              }}
+              smoothness={{
+                value: report.reportData.smoothness ?? 0,
+                status: getSkinScoreStatus(report.reportData.smoothness ?? 0),
+              }}
+              poreClarity={{
+                value: report.reportData.pore_clarity ?? 0,
+                status: getSkinScoreStatus(report.reportData.pore_clarity ?? 0),
+              }}
+              acne={{
+                value: report.reportData.acne_severity ?? 0,
+                status: getSkinScoreStatus(
+                  report.reportData.acne_severity ?? 0
+                ),
+              }}
+              elasticity={{
+                value: report.reportData.elasticity ?? 0,
+                status: getSkinScoreStatus(report.reportData.elasticity ?? 0),
+              }}
+              maxPotential={93}
               date={new Date(report.timestamp).toLocaleDateString("en-US", {
                 month: "long",
                 day: "numeric",
@@ -151,6 +182,12 @@ export default function ReportsPage() {
       </View>
     </SafeAreaView>
   );
+}
+
+function getSkinScoreStatus(score: number) {
+  if (score >= 80) return "Good";
+  if (score >= 60) return "Fair";
+  return "Poor";
 }
 
 const styles = StyleSheet.create({

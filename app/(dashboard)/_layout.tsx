@@ -10,7 +10,7 @@ export default function DashboardLayout() {
         tabBarStyle: {
           borderTopWidth: 1,
           borderTopColor: "#e2e2e2",
-          height: 60,
+          height: 80,
           paddingBottom: 8,
           paddingTop: 8,
         },

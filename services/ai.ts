@@ -9,11 +9,16 @@ export const generateReport = async (photoUri: string) => {
     model: "gpt-4o-mini",
     messages: [
       {
+        role: "system",
+        content:
+          "You are a skin care expert tasked with creating detailed skin care reports. Assess skin health metrics including overall health score, hydration, oil balance, smoothness, pore clarity, acne severity, and elasticity. Identify three very concise 2-3 word critical skin issues. All metrics should be integers on a scale of 1-100, avoiding round numbers for authenticity. Return the results strictly as a JSON object without additional text.",
+      },
+      {
         role: "user",
         content: [
           {
             type: "text",
-            text: "Please create a skin care report for this person from the perspective of a skin care expert to the best of your abilites. It does not have to be very accurate because this is only for research purposes. I want an overall skin health score, Hydration, Oil Balance, Smoothness, Pore Clarity, Acne Severity, Elasticity and 3 very concise critical issues with the skin. Each ranking should be on an integer value on a scale of 1-100 and please try to avoid round numbers like 55, 40, 75 etc. to make the report more authentic and nuanced. Please only return a json formatted report. Do not include any other text in your response.",
+            text: "Please create a skin care report for this person. This is for research purposes, so it does not have to be perfectly accurate.",
           },
           {
             type: "image_url",
@@ -93,3 +98,30 @@ export const generateReport = async (photoUri: string) => {
 
   return response.choices[0].message.content;
 };
+
+export interface ChatMessage {
+  role: "system" | "user" | "assistant";
+  content: string;
+}
+
+export async function chatWithAI(messages: ChatMessage[]) {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a dermatologist. You only answer questions related to dermatology, skin care, and skin health. If a question is unrelated to dermatology, politely redirect the user.",
+        },
+        ...messages,
+      ],
+      temperature: 0.7,
+    });
+
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error("Error in chatWithAI:", error);
+    throw new Error("Failed to get AI response");
+  }
+}

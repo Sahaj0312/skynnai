@@ -7,15 +7,23 @@ import {
   Pressable,
   Text,
   SafeAreaView,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Animated, { FadeIn } from "react-native-reanimated";
+import * as FileSystem from "expo-file-system";
+import { generateReport } from "@/services/ai";
+import useRevenueCat from "@/hooks/useRevenueCat";
 
 export default function Confirmation() {
   const router = useRouter();
   const { photoUri } = useLocalSearchParams();
   const [name, setName] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const { isProMember } = useRevenueCat();
 
   useEffect(() => {
     loadUserData();
@@ -34,26 +42,78 @@ export default function Confirmation() {
   };
 
   const handleRetake = () => {
+    if (isProcessing) return; // Prevent retake while processing
     router.back();
   };
 
   const handleContinue = async () => {
+    if (isProcessing) return; // Prevent multiple submissions
+
     try {
       const userData = await AsyncStorage.getItem("userData");
-      if (userData) {
-        const parsedData = JSON.parse(userData);
-        await AsyncStorage.setItem(
-          "userData",
-          JSON.stringify({
-            ...parsedData,
-            photoUri,
-          })
-        );
+      if (!userData) return;
+
+      const parsedData = JSON.parse(userData);
+      await AsyncStorage.setItem(
+        "userData",
+        JSON.stringify({
+          ...parsedData,
+          photoUri,
+        })
+      );
+
+      if (isProMember) {
+        setIsProcessing(true);
+
+        const base64 = await FileSystem.readAsStringAsync(photoUri as string, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+
+        const reportData = await generateReport(base64);
+        if (!reportData) {
+          throw new Error("Failed to generate report");
+        }
+
+        const parsedReportData = JSON.parse(reportData);
+        if (parsedReportData.face_detected === false) {
+          Alert.alert(
+            "No face detected",
+            "Please ensure your face is clearly visible in the photo."
+          );
+          setIsProcessing(false);
+          return;
+        }
+
+        // Save the new report
+        const newReport = {
+          id: Date.now().toString(),
+          timestamp: new Date().toISOString(),
+          reportData: parsedReportData,
+          photoUri,
+          name: parsedData.name,
+        };
+
+        // Get existing reports
+        const existingReports = await AsyncStorage.getItem("userReports");
+        const reports = existingReports ? JSON.parse(existingReports) : [];
+
+        // Add new report
+        reports.unshift(newReport);
+
+        // Save updated reports
+        await AsyncStorage.setItem("userReports", JSON.stringify(reports));
+
+        // Navigate to dashboard reports
+        router.replace("/(dashboard)/reports");
+      } else {
+        // For non-pro members, show blur page
+        router.push("/blur");
       }
-      router.push("/blur");
     } catch (error) {
-      console.error("Error saving photo:", error);
-      router.push("/report");
+      console.error("Error processing photo:", error);
+      setError("Failed to process photo");
+      Alert.alert("Error", "Failed to process your photo. Please try again.");
+      setIsProcessing(false);
     }
   };
 
@@ -64,7 +124,7 @@ export default function Confirmation() {
           <Text style={styles.greeting}>Looking great {name} :)</Text>
         </Animated.View>
 
-        <Animated.View entering={FadeIn.duration(2500).delay(600)}>
+        <Animated.View entering={FadeIn.duration(1000).delay(200)}>
           <Text style={styles.subheading}>
             For best results, please ensure your face is clearly visible.
           </Text>
@@ -82,12 +142,29 @@ export default function Confirmation() {
       </View>
 
       <View style={styles.buttonContainer}>
-        <Pressable style={styles.button} onPress={handleRetake}>
-          <Text style={styles.buttonText}>Retake</Text>
-        </Pressable>
-        <Pressable style={styles.button} onPress={handleContinue}>
-          <Text style={styles.buttonText}>Continue</Text>
-        </Pressable>
+        {isProcessing ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#005b4f" />
+            <Text style={styles.loadingText}>Analyzing your skin...</Text>
+          </View>
+        ) : (
+          <>
+            <Pressable
+              style={[styles.button, isProcessing && styles.buttonDisabled]}
+              onPress={handleRetake}
+              disabled={isProcessing}
+            >
+              <Text style={styles.buttonText}>Retake</Text>
+            </Pressable>
+            <Pressable
+              style={[styles.button, isProcessing && styles.buttonDisabled]}
+              onPress={handleContinue}
+              disabled={isProcessing}
+            >
+              <Text style={styles.buttonText}>Continue</Text>
+            </Pressable>
+          </>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -155,5 +232,19 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#005b4f",
     opacity: 0.8,
+  },
+  loadingContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 20,
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: SCREEN_HEIGHT * 0.02,
+    color: "#005b4f",
+    fontWeight: "500",
+  },
+  buttonDisabled: {
+    opacity: 0.5,
   },
 });

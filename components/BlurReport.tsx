@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   View,
   Text,
@@ -8,11 +8,15 @@ import {
   Image,
   SafeAreaView,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import RevenueCatUI, { PAYWALL_RESULT } from "react-native-purchases-ui";
+import * as FileSystem from "expo-file-system";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 import useRevenueCat from "../hooks/useRevenueCat";
+import { generateReport } from "@/services/ai";
 
 interface BlurReportProps {
   name: string;
@@ -23,16 +27,79 @@ interface BlurReportProps {
 export default function BlurReport(props: BlurReportProps) {
   const { name, photoUri, date } = props;
   const { isProMember } = useRevenueCat();
-  console.log(isProMember);
+
+  const generateAndSaveReport = async () => {
+    try {
+      const base64 = await FileSystem.readAsStringAsync(photoUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
+
+      const reportData = await generateReport(base64);
+      if (!reportData) {
+        throw new Error("Failed to generate report");
+      }
+      const parsedReportData = JSON.parse(reportData);
+      if (parsedReportData.face_detected === false) {
+        Alert.alert(
+          "No face detected",
+          "Please ensure your face is clearly visible in the photo."
+        );
+        return;
+      }
+
+      // Save the new report
+      const newReport = {
+        id: Date.now().toString(),
+        timestamp: new Date().toISOString(),
+        reportData: parsedReportData,
+        photoUri,
+        name,
+      };
+
+      // Get existing reports
+      const existingReports = await AsyncStorage.getItem("userReports");
+      const reports = existingReports ? JSON.parse(existingReports) : [];
+
+      // Add new report
+      reports.unshift(newReport);
+
+      // Save updated reports
+      await AsyncStorage.setItem("userReports", JSON.stringify(reports));
+
+      router.push("/(dashboard)/reports");
+    } catch (error) {
+      console.error("Error generating report:", error);
+      // Handle error appropriately
+    }
+  };
+
   const handleUnlockReport = async () => {
     const paywallResult: PAYWALL_RESULT =
       await RevenueCatUI.presentPaywallIfNeeded({
         requiredEntitlementIdentifier: "pro",
       });
-    console.log(paywallResult);
-    console.log(isProMember);
-    //router.push("/(dashboard)/reports");
+
+    switch (paywallResult) {
+      case PAYWALL_RESULT.PURCHASED:
+        await generateAndSaveReport();
+        break;
+      case PAYWALL_RESULT.RESTORED:
+        await generateAndSaveReport();
+        break;
+      case PAYWALL_RESULT.NOT_PRESENTED:
+      case PAYWALL_RESULT.ERROR:
+      case PAYWALL_RESULT.CANCELLED:
+      default:
+        return;
+    }
   };
+
+  // If user is already a pro member, generate report immediately
+  useEffect(() => {
+    if (isProMember) {
+      generateAndSaveReport();
+    }
+  }, [isProMember]);
 
   return (
     <SafeAreaView style={styles.container}>

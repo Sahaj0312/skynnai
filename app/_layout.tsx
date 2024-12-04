@@ -1,8 +1,7 @@
 import { Stack } from "expo-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-
 import { Platform } from "react-native";
 import Purchases from "react-native-purchases";
 
@@ -13,21 +12,28 @@ export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     // Add any custom fonts here
   });
+  const [isRevenueCatInitialized, setIsRevenueCatInitialized] = useState(false);
 
   useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
+    async function initializeRevenueCat() {
+      if (Platform.OS === "ios") {
+        await Purchases.configure({
+          apiKey: process.env.EXPO_PUBLIC_RC_IOS as string,
+        });
+      }
+      setIsRevenueCatInitialized(true);
     }
-  }, [fontsLoaded]);
 
-  //configure revenuecat
-  useEffect(() => {
-    if (Platform.OS === "ios") {
-      Purchases.configure({ apiKey: process.env.EXPO_PUBLIC_RC_IOS });
-    }
+    initializeRevenueCat();
   }, []);
 
-  if (!fontsLoaded) {
+  useEffect(() => {
+    if (fontsLoaded && isRevenueCatInitialized) {
+      SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, isRevenueCatInitialized]);
+
+  if (!fontsLoaded || !isRevenueCatInitialized) {
     return null;
   }
 

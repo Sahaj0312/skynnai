@@ -6,16 +6,32 @@ import { generateReport } from "@/services/ai";
 import { storage } from "@/services/storage";
 import * as FileSystem from "expo-file-system";
 
-export default function ReportScreen() {
-  const [name, setName] = useState<string>("");
-  const [photoUri, setPhotoUri] = useState<string>("");
-  const [report, setReport] = useState<any>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+interface ReportScreenProps {
+  isStatic?: boolean;
+  reportData?: any;
+  name?: string;
+  photoUri?: string;
+  date?: string;
+}
+
+export default function ReportScreen({
+  isStatic,
+  reportData,
+  name: initialName,
+  photoUri: initialPhotoUri,
+  date: initialDate,
+}: ReportScreenProps) {
+  const [name, setName] = useState<string>(initialName || "");
+  const [photoUri, setPhotoUri] = useState<string>(initialPhotoUri || "");
+  const [report, setReport] = useState<any>(reportData || null);
+  const [loading, setLoading] = useState<boolean>(!isStatic);
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    loadUserDataAndAi();
-  }, []);
+    if (!isStatic) {
+      loadUserDataAndAi();
+    }
+  }, [isStatic]);
 
   const getSkinScoreStatus = (score: number) => {
     if (score >= 80) return "Good";
@@ -75,6 +91,11 @@ export default function ReportScreen() {
         <Text style={styles.errorText}>{error}</Text>
       ) : !report ? (
         <Text style={styles.errorText}>No report data available</Text>
+      ) : report.face_detected === false ? (
+        <Text style={styles.errorText}>
+          No face detected. Please ensure your face is clearly visible in the
+          photo.
+        </Text>
       ) : (
         <ReportCard
           name={name}

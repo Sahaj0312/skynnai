@@ -16,7 +16,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import Report from "@/components/Report";
 import useRevenueCat from "@/hooks/useRevenueCat";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 interface StoredReport {
   id: string;
@@ -211,12 +211,13 @@ const styles = StyleSheet.create({
   },
   slideContainer: {
     width: SCREEN_WIDTH,
+    paddingHorizontal: 10,
   },
   pagination: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 20,
+    paddingVertical: 10,
   },
   paginationDot: {
     width: 8,

@@ -152,6 +152,13 @@ export default function ReportsPage() {
                 value: report.reportData.elasticity ?? 0,
                 status: getSkinScoreStatus(report.reportData.elasticity ?? 0),
               }}
+              issues={
+                report.reportData.issues ?? [
+                  "moderate dryness",
+                  "occasional breakouts",
+                  "uneven skin tone",
+                ]
+              }
               maxPotential={generateMaxPotential(
                 report.reportData.overall_skin_health_score ?? 0
               )}

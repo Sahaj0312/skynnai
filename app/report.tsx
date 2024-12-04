@@ -129,6 +129,7 @@ export default function ReportScreen({
             status: getSkinScoreStatus(report.elasticity ?? 0),
           }}
           maxPotential={93}
+          issues={report.issues ?? ["hello", "world", "this is a test"]}
           date={new Date().toLocaleDateString("en-US", {
             month: "long",
             day: "numeric",

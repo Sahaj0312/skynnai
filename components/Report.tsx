@@ -8,6 +8,7 @@ import {
   Image,
   SafeAreaView,
   TouchableOpacity,
+  FlatList,
 } from "react-native";
 import CircularProgress from "react-native-circular-progress-indicator";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -33,6 +34,7 @@ interface ReportProps {
   acne?: MetricData;
   elasticity?: MetricData;
   maxPotential: number;
+  issues: string[];
   date: string;
 }
 
@@ -48,12 +50,13 @@ export default function Report(props: ReportProps) {
     acne,
     elasticity,
     maxPotential,
+    issues,
     date,
   } = props;
 
-  const handleUnlockReport = () => {
-    router.push("/(dashboard)/reports");
-  };
+  // const handleUnlockReport = () => {
+  //   router.push("/(dashboard)/reports");
+  // };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -131,7 +134,7 @@ export default function Report(props: ReportProps) {
           </View>
         </View>
         <View style={styles.overallHealthSection}>
-          <Text style={styles.overallTitle}>Overall Skin Health</Text>
+          {/* <Text style={styles.overallTitle}>Overall Skin Health</Text> */}
           <CircularProgress
             value={skinScore.value}
             radius={80}
@@ -155,9 +158,12 @@ export default function Report(props: ReportProps) {
             Critical Issues
           </Text>
           <View style={styles.issuesList}>
-            <Text style={styles.issueItem}>• XXX XXX XXXXXXX</Text>
-            <Text style={styles.issueItem}>• XXXX XXXXXXX</Text>
-            <Text style={styles.issueItem}>• XXXX XXXXXX</Text>
+            {issues.map((issue) => (
+              <View key={issue} style={{ flexDirection: "row" }}>
+                <Text>•</Text>
+                <Text style={styles.issueItem}>{issue}</Text>
+              </View>
+            ))}
           </View>
         </View>
 
@@ -175,9 +181,9 @@ export default function Report(props: ReportProps) {
         </View>
       </View>
 
-      <TouchableOpacity style={styles.button} onPress={handleUnlockReport}>
+      {/* <TouchableOpacity style={styles.button} onPress={handleUnlockReport}>
         <Text style={styles.buttonText}>Unlock Report</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </SafeAreaView>
   );
 }
@@ -337,7 +343,7 @@ const styles = StyleSheet.create({
   },
   issueItem: {
     fontSize: SCREEN_HEIGHT * 0.016,
-    fontWeight: "500",
+    fontWeight: "600",
     color: "#000",
   },
   potentialContainer: {

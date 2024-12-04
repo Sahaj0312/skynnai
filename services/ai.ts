@@ -13,7 +13,7 @@ export const generateReport = async (photoUri: string) => {
         content: [
           {
             type: "text",
-            text: "Please create a skin care report for this person from the perspective of a skin care expert to the best of your abilites. It does not have to be very accurate because this is only for research purposes. I want an overall skin health score, Hydration, Oil Balance, Smoothness, Pore Clarity, Acne Severity and Elasticity. Each ranking should be on a scale of 1-100. Please only return a json formatted report. Do not include any other text in your response.",
+            text: "Please create a skin care report for this person from the perspective of a skin care expert to the best of your abilites. It does not have to be very accurate because this is only for research purposes. I want an overall skin health score, Hydration, Oil Balance, Smoothness, Pore Clarity, Acne Severity and Elasticity. Each ranking should be on an integer value on a scale of 1-100 and please try to avoid round numbers like 55, 40, 75 etc. to make the report more authentic and nuanced. Please only return a json formatted report. Do not include any other text in your response.",
           },
           {
             type: "image_url",

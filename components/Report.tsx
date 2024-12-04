@@ -164,10 +164,12 @@ export default function Report(props: ReportProps) {
         <View style={[styles.bottomCard, styles.rightBottomCard]}>
           <Text style={styles.bottomCardTitle}>Max Potential</Text>
           <View style={styles.potentialContainer}>
-            <Text style={styles.potentialScore}>93%</Text>
+            <Text style={styles.potentialScore}>{maxPotential}%</Text>
             <View style={styles.improvementContainer}>
               <MaterialIcons name="arrow-upward" size={16} color="#4CAF50" />
-              <Text style={styles.improvementText}>+XX%</Text>
+              <Text style={styles.improvementText}>
+                +{maxPotential - skinScore.value}%
+              </Text>
             </View>
           </View>
         </View>

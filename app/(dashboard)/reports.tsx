@@ -32,6 +32,18 @@ export default function ReportsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const { isProMember } = useRevenueCat();
 
+  function generateMaxPotential(score: number): number {
+    const min = Math.max(87, score + 1);
+    const max = 97;
+
+    // Ensure min does not exceed max
+    if (min > max) {
+      return max;
+    }
+
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
   // AsyncStorage.clear();
 
   useEffect(() => {
@@ -140,7 +152,9 @@ export default function ReportsPage() {
                 value: report.reportData.elasticity ?? 0,
                 status: getSkinScoreStatus(report.reportData.elasticity ?? 0),
               }}
-              maxPotential={93}
+              maxPotential={generateMaxPotential(
+                report.reportData.overall_skin_health_score ?? 0
+              )}
               date={new Date(report.timestamp).toLocaleDateString("en-US", {
                 month: "long",
                 day: "numeric",

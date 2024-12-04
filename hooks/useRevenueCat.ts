@@ -14,7 +14,12 @@ function useRevenueCat() {
     useState<PurchasesOffering | null>(null);
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null);
 
-  const isProMember = customerInfo?.entitlements.active.pro != null;
+  const isProMember =
+    customerInfo?.activeSubscriptions.some(
+      (subscription) =>
+        subscription === typesOfSubscriptions.weekly ||
+        subscription === typesOfSubscriptions.monthly
+    ) ?? false;
 
   useEffect(() => {
     const loadData = async () => {

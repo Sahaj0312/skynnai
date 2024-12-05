@@ -8,10 +8,12 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MaterialIcons } from "@expo/vector-icons";
 import { chatWithAI, ChatMessage } from "../../services/ai";
+import { storage } from "../../services/storage";
+import { TypingIndicator } from "../../components/TypingIndicator";
 
 type Message = {
   id: string;
@@ -24,7 +26,7 @@ export default function ChatPage() {
   const [messages, setMessages] = React.useState<Message[]>([
     {
       id: "1",
-      text: "Hello! I'm your skincare AI assistant. How can I help you today?",
+      text: `Hello! I'm Skynn, your AI skincare expert. How can I help you today?`,
       sender: "ai",
       timestamp: new Date(),
     },
@@ -77,7 +79,7 @@ export default function ChatPage() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["left", "right"]}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
@@ -112,6 +114,7 @@ export default function ChatPage() {
               </Text>
             </View>
           ))}
+          {isLoading && <TypingIndicator />}
         </ScrollView>
         <View style={styles.inputContainer}>
           <TextInput
@@ -146,6 +149,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: 15,
+    paddingTop: 20,
     paddingBottom: 20,
   },
   messageBox: {

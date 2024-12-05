@@ -5,6 +5,7 @@ import WelcomePage from "./welcome";
 import useRevenueCat from "@/hooks/useRevenueCat";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import storage from "@/services/storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Index() {
   const { isProMember, customerInfo } = useRevenueCat();
@@ -12,6 +13,7 @@ export default function Index() {
   useEffect(() => {
     const checkUserStatus = async () => {
       try {
+        //await AsyncStorage.clear();
         // Wait for customerInfo to be loaded
         if (customerInfo === null) {
           console.log("CustomerInfo is null, waiting...");

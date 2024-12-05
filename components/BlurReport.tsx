@@ -17,6 +17,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 import useRevenueCat from "../hooks/useRevenueCat";
 import { generateReport } from "@/services/ai";
+import Purchases from "react-native-purchases";
 
 interface BlurReportProps {
   name: string;
@@ -79,16 +80,32 @@ export default function BlurReport(props: BlurReportProps) {
         requiredEntitlementIdentifier: "pro",
       });
 
+    const restorePurchases = async () => {
+      const purchaserInfo = await Purchases.restorePurchases();
+      if (purchaserInfo.activeSubscriptions.length > 0) {
+        Alert.alert("Success", "Your purchase has been restored.");
+      } else {
+        Alert.alert("Error", "Failed to restore purchase.");
+      }
+    };
+
     switch (paywallResult) {
       case PAYWALL_RESULT.PURCHASED:
         await generateAndSaveReport();
         break;
       case PAYWALL_RESULT.RESTORED:
-        await generateAndSaveReport();
+        console.log("RESTORED");
+        await restorePurchases();
         break;
       case PAYWALL_RESULT.NOT_PRESENTED:
+        console.log("NOT PRESENTED");
+        break;
       case PAYWALL_RESULT.ERROR:
+        console.log("ERROR");
+        break;
       case PAYWALL_RESULT.CANCELLED:
+        console.log("CANCELLED");
+        break;
       default:
         return;
     }

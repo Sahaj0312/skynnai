@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import OpenAI from "openai";
 
 const openai = new OpenAI({
@@ -105,14 +106,26 @@ export interface ChatMessage {
 }
 
 export async function chatWithAI(messages: ChatMessage[]) {
+  const existingReports = await AsyncStorage.getItem("userReports");
+  const reports = existingReports ? JSON.parse(existingReports) : [];
+  let prompt = "";
+  if (reports.length > 0) {
+    const latestReport = reports[0];
+    prompt = `You are a dermatologist. You only answer questions related to dermatology, skin care, and skin health. If a question is unrelated to dermatology, politely redirect the user. Here is the latest report so you may reference it in your responses: ${JSON.stringify(
+      latestReport.reportData
+    )}`;
+  } else {
+    prompt =
+      "You are a dermatologist. You only answer questions related to dermatology, skin care, and skin health. If a question is unrelated to dermatology, politely redirect the user.";
+  }
+
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
-          content:
-            "You are a dermatologist. You only answer questions related to dermatology, skin care, and skin health. If a question is unrelated to dermatology, politely redirect the user.",
+          content: prompt,
         },
         ...messages,
       ],

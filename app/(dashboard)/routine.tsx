@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-
+import DateSlider from "@/components/DateSlider";
 const routineSteps = [
   {
     time: "Morning",
@@ -26,6 +26,7 @@ const routineSteps = [
 export default function RoutinePage() {
   return (
     <SafeAreaView style={styles.container}>
+      <DateSlider />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {routineSteps.map((routine, index) => (
           <View key={routine.time} style={styles.routineSection}>

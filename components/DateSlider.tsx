@@ -1,5 +1,11 @@
 import React from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import {
   eachWeekOfInterval,
   addDays,
@@ -99,7 +105,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   sliderContainer: {
-    height: 80,
+    height: Dimensions.get("window").height * 0.07,
   },
   selectedDay: {
     backgroundColor: "#005b4f",

@@ -107,28 +107,18 @@ export const routineStorage = {
           evening: routineData.completions?.evening || {},
         },
         streak: routineData.streak || 0,
+        lastCompletedDate: routineData.lastCompletedDate,
       };
-
-      // Check if all steps for both morning and evening are completed
-      const morningSteps = safeRoutineData.routine.morning.length;
-      const eveningSteps = safeRoutineData.routine.evening.length;
-
-      // Safely get completion counts
-      const morningCompleted = Object.values(
-        safeRoutineData.completions.morning
-      ).filter(Boolean).length;
-      const eveningCompleted = Object.values(
-        safeRoutineData.completions.evening
-      ).filter(Boolean).length;
 
       const today = new Date().toISOString().split("T")[0];
 
-      // Only consider routine complete if BOTH morning and evening are done
-      const isFullyCompleted =
-        morningCompleted === morningSteps && eveningCompleted === eveningSteps;
-
-      // Reset completions at the start of each new day
-      if (safeRoutineData.lastCompletedDate !== today) {
+      // Only reset completions if it's a new day AND we haven't already completed anything today
+      if (
+        safeRoutineData.lastCompletedDate !== today &&
+        Object.keys(safeRoutineData.completions.morning).length === 0 &&
+        Object.keys(safeRoutineData.completions.evening).length === 0
+      ) {
+        // Reset completions only if we're starting a new day
         safeRoutineData.completions = {
           morning: {},
           evening: {},
@@ -149,7 +139,23 @@ export const routineStorage = {
         }
       }
 
-      // Update streak only when both routines are completed
+      // Check if all steps for both morning and evening are completed
+      const morningSteps = safeRoutineData.routine.morning.length;
+      const eveningSteps = safeRoutineData.routine.evening.length;
+
+      const morningCompleted = Object.values(
+        safeRoutineData.completions.morning
+      ).filter(Boolean).length;
+      const eveningCompleted = Object.values(
+        safeRoutineData.completions.evening
+      ).filter(Boolean).length;
+
+      // Only consider routine complete if BOTH morning and evening are done
+      const isFullyCompleted =
+        morningCompleted === morningSteps && eveningCompleted === eveningSteps;
+
+      // Update streak and lastCompletedDate only when both routines are completed
+      // and we haven't already marked completion for today
       if (isFullyCompleted && safeRoutineData.lastCompletedDate !== today) {
         safeRoutineData.streak += 1;
         safeRoutineData.lastCompletedDate = today;

@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View } from "react-native";
 import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 import {
   eachWeekOfInterval,
   addDays,
@@ -8,13 +8,14 @@ import {
   format,
 } from "date-fns";
 import PagerView from "react-native-pager-view";
+
 const dates = eachWeekOfInterval(
   {
     start: subDays(new Date(), 14),
     end: addDays(new Date(), 14),
   },
   { weekStartsOn: 1 }
-).reduce((acc: Date[][], cur) => {
+).reduce<Date[][]>((acc, cur) => {
   const allDays = eachDayOfInterval({
     start: cur,
     end: addDays(cur, 6),
@@ -23,27 +24,34 @@ const dates = eachWeekOfInterval(
   return acc;
 }, []);
 
-const DateSlider = () => {
+interface DayProps {
+  day: Date;
+}
+
+const Day: React.FC<DayProps> = ({ day }) => {
+  const txt = format(day, "EEEEE");
+  const dayKey = day.toISOString();
+
+  return (
+    <View style={styles.day} key={dayKey}>
+      <Text>{txt}</Text>
+      <Text>{day.getDate()}</Text>
+    </View>
+  );
+};
+
+const DateSlider: React.FC = () => {
   return (
     <PagerView style={styles.container}>
-      {dates.map((week, index) => {
-        return (
-          <View key={index}>
-            <View style={styles.row}>
-              {week.map((day) => {
-                const txt = format(day, "EEEEE");
-
-                return (
-                  <View style={styles.day}>
-                    <Text>{txt}</Text>
-                    <Text>{day.getDate()}</Text>
-                  </View>
-                );
-              })}
-            </View>
+      {dates.map((week, index) => (
+        <View key={index}>
+          <View style={styles.row}>
+            {week.map((day) => (
+              <Day key={day.toISOString()} day={day} />
+            ))}
           </View>
-        );
-      })}
+        </View>
+      ))}
     </PagerView>
   );
 };

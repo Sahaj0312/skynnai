@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  Dimensions,
 } from "react-native";
 import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,6 +19,7 @@ import {
 import { MaterialIcons } from "@expo/vector-icons";
 
 type TimeOfDay = "morning" | "evening";
+type RoutineCompletion = Record<string, boolean>;
 
 const initialRoutineData: RoutineData = {
   routine: defaultRoutine,
@@ -26,6 +28,17 @@ const initialRoutineData: RoutineData = {
     evening: {},
   },
   streak: 0,
+};
+
+const getCompletionStatus = (
+  steps: RoutineStep[],
+  completions: RoutineCompletion
+) => {
+  const totalSteps = steps.length;
+  const completedSteps = Object.values(completions || {}).filter(
+    Boolean
+  ).length;
+  return `${completedSteps}/${totalSteps} steps`;
 };
 
 export default function RoutinePage() {
@@ -206,9 +219,18 @@ export default function RoutinePage() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.routineSection}>
           <View style={styles.headerRow}>
-            <Text style={styles.timeHeader}>
-              {selectedTime === "morning" ? "Morning" : "Evening"}
-            </Text>
+            <View style={styles.headerContent}>
+              {/* <Text style={styles.timeHeader}>
+                {selectedTime === "morning" ? "Morning" : "Evening"}
+              </Text> */}
+              <Text style={styles.timeHeader}>
+                Completed{" "}
+                {getCompletionStatus(
+                  routineData.routine?.[selectedTime] || [],
+                  routineData.completions?.[selectedTime] || {}
+                )}
+              </Text>
+            </View>
             <TouchableOpacity onPress={() => setIsEditing(!isEditing)}>
               <MaterialIcons
                 name={isEditing ? "check" : "edit"}
@@ -294,10 +316,10 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   timeHeader: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "600",
     color: "#005b4f",
-    marginBottom: 25,
+    marginBottom: 4,
   },
   stepContainer: {
     flexDirection: "row",
@@ -348,8 +370,11 @@ const styles = StyleSheet.create({
   headerRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     marginBottom: 20,
+  },
+  headerContent: {
+    flex: 1,
   },
   stepCheckbox: {
     marginRight: 10,

@@ -20,7 +20,7 @@ export default function Index() {
           return;
         }
 
-        console.log("CustomerInfo loaded:", customerInfo);
+        //console.log("CustomerInfo loaded:", customerInfo);
         console.log("Is Pro Member:", isProMember);
 
         // Check if user has completed onboarding
